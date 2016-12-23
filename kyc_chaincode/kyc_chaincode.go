@@ -80,6 +80,7 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
         return nil, unmarshalingError;
     }
 
+		fmt.Println("SAHIL: Person ID: " + person.id);
     creatingErr := stub.PutState(person.id, personAsBytes);
     if creatingErr != nil {
         return nil, creatingErr;

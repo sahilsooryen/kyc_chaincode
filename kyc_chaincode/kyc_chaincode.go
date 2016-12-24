@@ -13,15 +13,15 @@ type KYCChaincode struct {
 
 // Person structure
 type Person struct {
-    id string `json:"id"`;
-    docsMetaData []DocMetaData `json:"docsMetaData"`;
+    Id string `json:"id"`;
+    DocsMetaData []DocMetaData `json:"docsMetaData"`;
 }
 
 // Document's Meta-Data structure
 type DocMetaData struct {
-    id uint `json:"id"`;
-    hash string `json:"hash"`;
-    status string `json:"status"`;
+    Id uint `json:"id"`;
+    Hash string `json:"hash"`;
+    Status string `json:"status"`;
 }
 
 // ============================
@@ -74,15 +74,14 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
 
     personAsJSON := args[0];
     personAsBytes := []byte(personAsJSON);
-    //person := Person{};
-		var person Person
+    person := Person{};
     unmarshalingError := json.Unmarshal(personAsBytes, &person);
     if unmarshalingError != nil {
         return nil, unmarshalingError;
     }
 
-		fmt.Println("SAHIL: Person ID: " + person.id);
-    creatingErr := stub.PutState(person.id, personAsBytes);
+		fmt.Println("SAHIL: Person ID: " + person.Id);
+    creatingErr := stub.PutState(person.Id, personAsBytes);
     if creatingErr != nil {
         return nil, creatingErr;
     }
@@ -126,7 +125,7 @@ func (kyc *KYCChaincode) updatePerson(stub shim.ChaincodeStubInterface, args []s
         return nil, unmarshalingError;
     }
 
-    updateErr := stub.PutState(person.id, personAsBytes);
+    updateErr := stub.PutState(person.Id, personAsBytes);
     if updateErr != nil {
         return nil, updateErr;
     }

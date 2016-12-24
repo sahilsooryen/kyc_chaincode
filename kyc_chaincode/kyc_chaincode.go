@@ -82,7 +82,7 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
 
 		fmt.Println("SAHIL: Person ID: " + person.Id);
     // creatingErr := stub.PutState(person.Id, personAsBytes);
-		creatingErr := stub.PutState("testId", "testValue");
+		creatingErr := stub.PutState("testId", []byte("testValue"));
     if creatingErr != nil {
         return nil, creatingErr;
     }

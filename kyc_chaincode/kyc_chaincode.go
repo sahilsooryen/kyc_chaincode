@@ -74,7 +74,8 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
 
     personAsJSON := args[0];
     personAsBytes := []byte(personAsJSON);
-    person := Person{};
+    //person := Person{};
+		var person Person
     unmarshalingError := json.Unmarshal(personAsBytes, &person);
     if unmarshalingError != nil {
         return nil, unmarshalingError;

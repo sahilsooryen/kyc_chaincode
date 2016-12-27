@@ -29,11 +29,14 @@ type DocMetaData struct {
 // ============================
 func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
-	creatingErr := stub.PutState("testId", []byte("testValue"));
+	var testKey string
+	var testValue string
+
+	creatingErr := stub.PutState(testKey, []byte(testValue));
 	if creatingErr != nil {
 			return nil, creatingErr;
 	}
-	
+
     return nil, nil;
 }
 
@@ -71,6 +74,9 @@ func (kyc *KYCChaincode) Query(stub shim.ChaincodeStubInterface, function string
 // CreatePerson - this method writes a new Person object into the ledger
 // ======================================================================
 func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+    var testKey string
+		var testValue string
+
     err := kyc.checkArguments(args);
     if err != nil {
         return nil, err;
@@ -86,7 +92,7 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
 
 		fmt.Println("SAHIL: Person ID: " + person.Id);
     // creatingErr := stub.PutState(person.Id, personAsBytes);
-		creatingErr := stub.PutState("testId", []byte("testValue"));
+		creatingErr := stub.PutState(testKey, []byte(testValue));
     if creatingErr != nil {
         return nil, creatingErr;
     }

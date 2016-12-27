@@ -29,7 +29,11 @@ type DocMetaData struct {
 // ============================
 func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
-
+	creatingErr := stub.PutState("testId", []byte("testValue"));
+	if creatingErr != nil {
+			return nil, creatingErr;
+	}
+	
     return nil, nil;
 }
 

@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	// "strconv"
-
+	"encoding/json"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -47,18 +47,36 @@ type DocMetaData struct {
 // }
 
 func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printf("SAHIL: Init called, initializing chaincode")
+	fmt.Printf("Init called, initializing chaincode")
 
-	if len(args) != 2 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 2")
-	}
+	// if len(args) != 2 {
+	// 	return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	// }
+	//
+	// var err error
+	//
+	// err = stub.PutState(args[0], []byte(args[1]))
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	var err error
-
-	err = stub.PutState(args[0], []byte(args[1]))
-	if err != nil {
-		return nil, err
-	}
+	// if len(args) != 1 {
+	// 	return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	// }
+	//
+	// personAsJSON := args[0];
+	// personAsBytes := []byte(personAsJSON);
+	//
+	// person := Person{};
+	// unmarshalingError := json.Unmarshal(personAsBytes, &person);
+	// if unmarshalingError != nil {
+	// 		return nil, unmarshalingError;
+	// }
+	//
+	// creatingErr := stub.PutState(person.Id, personAsBytes);
+	// if creatingErr != nil {
+	// 		return nil, creatingErr;
+	// }
 
 	return nil, nil
 }
@@ -67,15 +85,33 @@ func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string,
 func (t *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Printf("Running invoke")
 
-	if len(args) != 2 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	// if len(args) != 2 {
+	// 	return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	// }
+	//
+	// var err error
+	//
+	// err = stub.PutState(args[0], []byte(args[1]))
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
 
-	var err error
+	personAsJSON := args[0];
+	personAsBytes := []byte(personAsJSON);
 
-	err = stub.PutState(args[0], []byte(args[1]))
-	if err != nil {
-		return nil, err
+	person := Person{};
+	unmarshalingError := json.Unmarshal(personAsBytes, &person);
+	if unmarshalingError != nil {
+			return nil, unmarshalingError;
+	}
+
+	creatingErr := stub.PutState(person.Id, personAsBytes);
+	if creatingErr != nil {
+			return nil, creatingErr;
 	}
 
 	return nil, nil
@@ -152,16 +188,25 @@ func (kyc *KYCChaincode) Query(stub shim.ChaincodeStubInterface, function string
 	}
 
 	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
+		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
 
-	valueBytes, err := stub.GetState(args[0])
-	if err != nil {
-		jsonResp := "{\"Error\":\"Failed to get state for \"}"
-		return nil, errors.New(jsonResp)
+	personId := args[0];
+	personAsBytes, queryErr := stub.GetState(personId);
+	if queryErr != nil {
+        jsonResp := "{\"Error\":\"Failed to get state for person with (" + personId + ") GUID\"}";
+		return nil, errors.New(jsonResp);
 	}
 
-	return valueBytes, nil
+	return personAsBytes, nil
+
+	// valueBytes, err := stub.GetState(args[0])
+	// if err != nil {
+	// 	jsonResp := "{\"Error\":\"Failed to get state for \"}"
+	// 	return nil, errors.New(jsonResp)
+	// }
+
+	// return valueBytes, nil
 
 }
 

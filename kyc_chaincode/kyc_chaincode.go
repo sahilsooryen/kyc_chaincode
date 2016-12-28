@@ -104,13 +104,16 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
 // QueryPerson - this method reads a Person object from the ledger
 // ================================================================
 func (kyc *KYCChaincode) queryPerson(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var testKey string = "testKey"
+
     err := kyc.checkArguments(args);
     if err != nil {
         return nil, err;
     }
 
     personGUID := args[0];
-	personAsBytes, queryErr := stub.GetState(personGUID);
+	//personAsBytes, queryErr := stub.GetState(personGUID);
+	personAsBytes, queryErr := stub.GetState(testKey);
 	if queryErr != nil {
         jsonResp := "{\"Error\":\"Failed to get state for person with (" + personGUID + ") GUID\"}";
 		return nil, errors.New(jsonResp);

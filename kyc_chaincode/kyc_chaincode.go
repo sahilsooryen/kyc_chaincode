@@ -75,7 +75,7 @@ func (kyc *KYCChaincode) Query(stub shim.ChaincodeStubInterface, function string
 // ======================================================================
 func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     var testKey string = "testKey"
-		var testValue string = "testValue"
+		var testValue string = "testValue1"
 
     err := kyc.checkArguments(args);
     if err != nil {
@@ -83,7 +83,13 @@ func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []s
     }
 
     personAsJSON := args[0];
-    personAsBytes := []byte(personAsJSON);
+    //personAsBytes := []byte(personAsJSON);
+		personAsBytes, queryErr := stub.GetState(testKey);
+		if queryErr != nil {
+	        jsonResp := "{\"Error\":\"Failed to get state for person with (\"  \") GUID\"}";
+			return nil, errors.New(jsonResp);
+		}
+		personAsBytes = []byte(personAsJSON);
     person := Person{};
     unmarshalingError := json.Unmarshal(personAsBytes, &person);
     if unmarshalingError != nil {

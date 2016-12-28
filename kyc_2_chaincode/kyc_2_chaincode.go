@@ -82,7 +82,7 @@ func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string,
 }
 
 // Transaction makes payment of X units from A to B
-func (t *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (kyc *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Printf("SAHIL: Running invoke")
 
 	// if len(args) != 2 {
@@ -101,8 +101,10 @@ func (t *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) (
 	}
 
 	personAsJSON := args[0];
+	personAsJSON2 := args[0];
 	// personAsJSON := args[1];
 	personAsBytes := []byte(personAsJSON);
+	personAsBytes2 := []byte(personAsJSON2);
 
 	person := Person{};
 	unmarshalingError := json.Unmarshal(personAsBytes, &person);
@@ -112,7 +114,7 @@ func (t *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) (
 
 	fmt.Printf("SAHIL: Person ID = " + person.Id + ", Person Object = " + string(personAsBytes))
 
-	creatingErr := stub.PutState(person.Id, personAsBytes);
+	creatingErr := stub.PutState(person.Id, personAsBytes2);
 	// creatingErr := stub.PutState(args[0], personAsBytes);
 	if creatingErr != nil {
 			return nil, creatingErr;

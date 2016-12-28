@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	// "strconv"
-	// "encoding/json"
+	"encoding/json"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -83,7 +83,7 @@ func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string,
 
 // Transaction makes payment of X units from A to B
 func (t *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Printf("Running invoke")
+	fmt.Printf("SAHIL: Running invoke")
 
 	// if len(args) != 2 {
 	// 	return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -96,22 +96,24 @@ func (t *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) (
 	// 	return nil, err
 	// }
 
-	if len(args) != 2 {
+	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
 
-	// personAsJSON := args[0];
-	personAsJSON := args[1];
+	personAsJSON := args[0];
+	// personAsJSON := args[1];
 	personAsBytes := []byte(personAsJSON);
 
-	// person := Person{};
-	// unmarshalingError := json.Unmarshal(personAsBytes, &person);
-	// if unmarshalingError != nil {
-	// 		return nil, unmarshalingError;
-	// }
+	person := Person{};
+	unmarshalingError := json.Unmarshal(personAsBytes, &person);
+	if unmarshalingError != nil {
+			return nil, unmarshalingError;
+	}
 
-	//creatingErr := stub.PutState(person.Id, personAsBytes);
-	creatingErr := stub.PutState(args[0], personAsBytes);
+	fmt.Printf("SAHIL: Person ID = " + person.Id + ", Person Object = " + string(personAsBytes))
+
+	creatingErr := stub.PutState(person.Id, personAsBytes);
+	// creatingErr := stub.PutState(args[0], personAsBytes);
 	if creatingErr != nil {
 			return nil, creatingErr;
 	}

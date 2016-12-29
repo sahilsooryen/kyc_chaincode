@@ -32,14 +32,21 @@ type KYCChaincode struct {
 // Person structure
 type Person struct {
     Id string `json:"id"`;
-    DocsMetaData []DocMetaData `json:"docsMetaData"`;
+    InfoElements []InfoElement `json:"infoElements"`;
 }
 
 // Document's Meta-Data structure
-type DocMetaData struct {
+type InfoElement struct {
     Id uint `json:"id"`;
+		Title string `json:"title"`;
+		ElementType string `json:"elementType"`;
+		ElementValue string `json:"elementValue"`;
+		ValidTill string `json:"validTill"`;
     Hash string `json:"hash"`;
+		VerifiedOn string `json:"verifiedOn"`;
+		VerificationProof string `json:"verificationProof"`;
     Status string `json:"status"`;
+		Comments string `json:"comments"`;
 }
 
 // SimpleChaincode example simple Chaincode implementation
@@ -79,6 +86,31 @@ func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string,
 	// }
 
 	return nil, nil
+}
+
+func (kyc *KYCChaincode) createPerson(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("SAHIL: Running invoke")
+
+	var err error
+
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	}
+
+	person := Person{}
+	person.Id = args[0]
+
+	infoElements := []InfoElement{}
+	person.InfoElements = infoElements
+
+	jsonAsBytes, _ := json.Marshal(person)								//marshal an emtpy array of strings to clear the index
+	err = stub.PutState(person.Id, jsonAsBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+
 }
 
 // Transaction makes payment of X units from A to B
@@ -160,6 +192,10 @@ func (kyc *KYCChaincode) Invoke(stub shim.ChaincodeStubInterface, function strin
 		// Deletes an entity from its state
 		fmt.Printf("Function is delete")
 		return kyc.delete(stub, args)
+	} else if function == "createPerson" {
+		// Deletes an entity from its state
+		fmt.Printf("Function is createPerson")
+		return kyc.createPerson(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")

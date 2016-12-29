@@ -47,7 +47,7 @@ type DocMetaData struct {
 // }
 
 func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printf("Init called, initializing chaincode")
+	fmt.Println("Init called, initializing chaincode")
 
 	// if len(args) != 2 {
 	// 	return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -105,10 +105,13 @@ func (kyc *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string)
 	personAsBytes := []byte(personAsJSON);
 
 	person := Person{};
-	unmarshalingError := json.Unmarshal(personAsBytes, &person);
-	if unmarshalingError != nil {
-			return nil, unmarshalingError;
-	}
+	fmt.Println("SAHIL: Before unmarshal")
+	// unmarshalingError := json.Unmarshal(personAsBytes, &person);
+	json.Unmarshal(personAsBytes, &person);
+	fmt.Println("SAHIL: After unmarshal")
+	// if unmarshalingError != nil {
+	// 		return nil, unmarshalingError;
+	// }
 
 	fmt.Println("SAHIL: Person ID = " + person.Id + ", Person Object = " + string(personAsBytes))
 

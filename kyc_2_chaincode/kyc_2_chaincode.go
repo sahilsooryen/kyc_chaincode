@@ -83,7 +83,7 @@ func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string,
 
 // Transaction makes payment of X units from A to B
 func (kyc *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Printf("SAHIL: Running invoke")
+	fmt.Println("SAHIL: Running invoke")
 
 	// if len(args) != 2 {
 	// 	return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -101,10 +101,8 @@ func (kyc *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string)
 	}
 
 	personAsJSON := args[0];
-	personAsJSON2 := args[0];
 	// personAsJSON := args[1];
 	personAsBytes := []byte(personAsJSON);
-	personAsBytes2 := []byte(personAsJSON2);
 
 	person := Person{};
 	unmarshalingError := json.Unmarshal(personAsBytes, &person);
@@ -112,9 +110,9 @@ func (kyc *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string)
 			return nil, unmarshalingError;
 	}
 
-	fmt.Printf("SAHIL: Person ID = " + person.Id + ", Person Object = " + string(personAsBytes))
+	fmt.Println("SAHIL: Person ID = " + person.Id + ", Person Object = " + string(personAsBytes))
 
-	creatingErr := stub.PutState(person.Id, personAsBytes2);
+	creatingErr := stub.PutState(person.Id, personAsBytes);
 	// creatingErr := stub.PutState(args[0], personAsBytes);
 	if creatingErr != nil {
 			return nil, creatingErr;
@@ -125,7 +123,7 @@ func (kyc *KYCChaincode) invoke(stub shim.ChaincodeStubInterface, args []string)
 
 // Deletes an entity from state
 func (kyc *KYCChaincode) delete(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Printf("Running delete")
+	fmt.Println("Running delete")
 
 	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 3")
@@ -145,7 +143,7 @@ func (kyc *KYCChaincode) delete(stub shim.ChaincodeStubInterface, args []string)
 // Invoke callback representing the invocation of a chaincode
 // This chaincode will manage two accounts A and B and will transfer X units from A to B upon invoke
 func (kyc *KYCChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printf("Invoke called, determining function")
+	fmt.Println("Invoke called, determining function")
 
 	// Handle different functions
 	if function == "invoke" {
@@ -165,7 +163,7 @@ func (kyc *KYCChaincode) Invoke(stub shim.ChaincodeStubInterface, function strin
 }
 
 func (kyc* KYCChaincode) Run(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printf("Run called, passing through to Invoke (same function)")
+	fmt.Println("Run called, passing through to Invoke (same function)")
 
 	// Handle different functions
 	if function == "invoke" {
@@ -186,7 +184,7 @@ func (kyc* KYCChaincode) Run(stub shim.ChaincodeStubInterface, function string, 
 
 // Query callback representing the query of a chaincode
 func (kyc *KYCChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printf("Query called, determining function")
+	fmt.Println("Query called, determining function")
 
 	if function != "query" {
 		fmt.Printf("Function is query")

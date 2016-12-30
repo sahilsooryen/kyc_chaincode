@@ -105,7 +105,6 @@ func (kyc *KYCChaincode) queryPerson(stub shim.ChaincodeStubInterface, args []st
 
 func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("CHAINCODE: updateInfoElement called")
-	var infoElementExists bool = false
 	var err error
 
 	if len(args) != 2 {
@@ -126,16 +125,23 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 	json.Unmarshal([]byte(args[1]), &infoElement)
 	fmt.Println("CHAINCODE: After Unmarshalling infoElement")
 
-	for _, infoElement1 := range person.InfoElements {
-		if infoElement1.Id == infoElement.Id {
-			infoElement = infoElement1
-			infoElementExists = true
-		}
-	}
+	alteredInfoElements := []InfoElement{}
 
-	if infoElementExists != true {
-		fmt.Println("CHAINCODE: Appending info element")
-		person.InfoElements = append(person.InfoElements, infoElement)
+	if len(person.InfoElements) > 0 {
+		for _, infoElement1 := range person.InfoElements {
+			if infoElement1.Id == infoElement.Id {
+				fmt.Println("CHAINCODE: Replacing the element found")
+				alteredInfoElements = append(alteredInfoElements, infoElement)
+			} else {
+				fmt.Println("CHAINCODE: Keeping the old element")
+				alteredInfoElements = append(alteredInfoElements, infoElement1)
+			}
+		}
+		fmt.Println("CHAINCODE: Replacing the infoElementsList with the altered one")
+		person.InfoElements = alteredInfoElements;
+	} else {
+			fmt.Println("CHAINCODE: Appending info element")
+			person.InfoElements = append(person.InfoElements, infoElement)
 	}
 
 	fmt.Println("CHAINCODE: Writing person back to ledger")

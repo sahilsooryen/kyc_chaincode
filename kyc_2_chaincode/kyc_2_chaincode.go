@@ -151,6 +151,46 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 }
 
+func (kyc *KYCChaincode) queryInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("CHAINCODE: queryInfoElement called")
+
+	var err error
+	var infoElementExists bool = false
+	var fetchedInfoElement InfoElement
+
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+
+	personJSONAsBytes, err := stub.GetState(args[0])
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + args[0] + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	person := Person{}
+	json.Unmarshal(personJSONAsBytes, &person)
+	fmt.Println("CHAINCODE: After Unmarshalling person")
+
+	for _, infoElement := range person.InfoElements {
+		if infoElement.Id == args[1]{
+			fetchedInfoElement = infoElement
+			infoElementExists = true
+			break
+		}
+	}
+
+	if infoElementExists == false {
+		jsonResp := "{\"Error\":\"InfoElement with id " + args[1] + " does not exist \"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	infoElementAsJSONBytes, _ := json.Marshal(fetchedInfoElement)
+
+	return infoElementAsJSONBytes, nil
+
+}
+
 // Deletes an entity from state
 func (kyc *KYCChaincode) delete(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("Running delete")

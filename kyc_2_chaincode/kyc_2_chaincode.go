@@ -128,7 +128,7 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 	for _, infoElement1 := range person.InfoElements {
 		if infoElement1.Id == infoElement.Id {
-			infoElement1 = infoElement
+			infoElement = infoElement1
 			infoElementExists = true
 		}
 	}
@@ -242,6 +242,9 @@ func (kyc *KYCChaincode) Query(stub shim.ChaincodeStubInterface, function string
 		// Deletes an entity from its state
 		fmt.Printf("Function is queryPerson")
 		return kyc.queryPerson(stub, args)
+	} else if function == "queryInfoElement" {
+		fmt.Printf("Function is queryInfoElement")
+		return kyc.queryInfoElement(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")

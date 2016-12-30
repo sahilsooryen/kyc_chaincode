@@ -138,6 +138,13 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 		person.InfoElements = append(person.InfoElements, infoElement)
 	}
 
+	fmt.Println("CHAINCODE: Writing person back to ledger")
+	jsonAsBytes, _ := json.Marshal(person)
+	err = stub.PutState(person.Id, jsonAsBytes)
+	if err != nil {
+		return nil, err
+	}
+
 	fmt.Println("CHAINCODE: Returning from updateInfoElement")
 
 	return nil, nil

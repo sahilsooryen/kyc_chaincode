@@ -104,8 +104,8 @@ func (kyc *KYCChaincode) queryPerson(stub shim.ChaincodeStubInterface, args []st
 }
 
 func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("CHAINCODE: createPerson called")
-	var infoElementExists bool
+	fmt.Println("CHAINCODE: updateInfoElement called")
+	var infoElementExists bool = false
 	var err error
 
 	if len(args) != 2 {
@@ -120,9 +120,11 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 	person := Person{}
 	json.Unmarshal(personJSONAsBytes, &person)
+	fmt.Println("CHAINCODE: After Unmarshalling person")
 
 	infoElement := InfoElement{}
 	json.Unmarshal([]byte(args[1]), &infoElement)
+	fmt.Println("CHAINCODE: After Unmarshalling infoElement")
 
 	for _, infoElement1 := range person.InfoElements {
 		if infoElement1.Id == infoElement.Id {
@@ -132,8 +134,11 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 	}
 
 	if infoElementExists != true {
+		fmt.Println("CHAINCODE: Appending info element")
 		person.InfoElements = append(person.InfoElements, infoElement)
 	}
+
+	fmt.Println("CHAINCODE: Returning from updateInfoElement")
 
 	return nil, nil
 

@@ -165,16 +165,17 @@ func (kyc *KYCChaincode) Invoke(stub shim.ChaincodeStubInterface, function strin
 
 	// Handle different functions
 	if function == "createPerson" {
-		// Deletes an entity from its state
 		fmt.Printf("Function is createPerson")
 		return kyc.createPerson(stub, args)
 	} else if function == "init" {
 		fmt.Printf("Function is init")
 		return kyc.Init(stub, function, args)
 	} else if function == "delete" {
-		// Deletes an entity from its state
 		fmt.Printf("Function is delete")
 		return kyc.delete(stub, args)
+	} else if function == "updateInfoElement" {
+		fmt.Printf("Function is updateInfoElement")
+		return kyc.updateInfoElement(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")

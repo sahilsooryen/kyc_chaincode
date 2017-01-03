@@ -157,6 +157,54 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 }
 
+func (kyc *KYCChaincode) deleteInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("CHAINCODE: deleteInfoElement called")
+	var err error
+
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+
+	personJSONAsBytes, err := stub.GetState(args[0])
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + args[0] + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	person := Person{}
+	json.Unmarshal(personJSONAsBytes, &person)
+	fmt.Println("CHAINCODE: After Unmarshalling person")
+
+	alteredInfoElements := []InfoElement{}
+
+	if len(person.InfoElements) > 0 {
+		for _, infoElement1 := range person.InfoElements {
+			if infoElement1.Id != args[1] {
+				fmt.Println("CHAINCODE: Keeping the old element")
+				alteredInfoElements = append(alteredInfoElements, infoElement1)
+			} else {
+				fmt.Println("CHAINCODE: Removing info element with id" + infoElement1.Id)
+			}
+		}
+		fmt.Println("CHAINCODE: Replacing the infoElementsList with the altered one")
+		person.InfoElements = alteredInfoElements;
+	} else {
+		return nil, nil
+	}
+
+	fmt.Println("CHAINCODE: Writing person back to ledger")
+	jsonAsBytes, _ := json.Marshal(person)
+	err = stub.PutState(person.Id, jsonAsBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("CHAINCODE: Returning from deleteInfoElement")
+
+	return nil, nil
+
+}
+
 func (kyc *KYCChaincode) queryInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("CHAINCODE: queryInfoElement called")
 
@@ -198,17 +246,15 @@ func (kyc *KYCChaincode) queryInfoElement(stub shim.ChaincodeStubInterface, args
 }
 
 // Deletes an entity from state
-func (kyc *KYCChaincode) delete(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("Running delete")
+func (kyc *KYCChaincode) deletePerson(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("CHAINCODE: Running deletePerson")
 
 	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 3")
 	}
 
-	A := args[0]
-
 	// Delete the key from the state in ledger
-	err := stub.DelState(A)
+	err := stub.DelState(args[0])
 	if err != nil {
 		return nil, errors.New("Failed to delete state")
 	}
@@ -228,12 +274,15 @@ func (kyc *KYCChaincode) Invoke(stub shim.ChaincodeStubInterface, function strin
 	} else if function == "init" {
 		fmt.Printf("Function is init")
 		return kyc.Init(stub, function, args)
-	} else if function == "delete" {
-		fmt.Printf("Function is delete")
-		return kyc.delete(stub, args)
 	} else if function == "updateInfoElement" {
 		fmt.Printf("Function is updateInfoElement")
 		return kyc.updateInfoElement(stub, args)
+	} else if function == "deletePerson" {
+		fmt.Printf("Function is deletePerson")
+		return kyc.deletePerson(stub, args)
+	} else if function == "deleteInfoElement" {
+		fmt.Printf("Function is deleteInfoElement")
+		return kyc.deleteInfoElement(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")

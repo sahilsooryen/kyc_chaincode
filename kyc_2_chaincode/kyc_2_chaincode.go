@@ -106,6 +106,7 @@ func (kyc *KYCChaincode) queryPerson(stub shim.ChaincodeStubInterface, args []st
 func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("CHAINCODE: updateInfoElement called")
 	var err error
+	var elementReplaced bool = false;
 
 	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -132,6 +133,7 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 			if infoElement1.Id == infoElement.Id {
 				fmt.Println("CHAINCODE: Replacing the element found")
 				alteredInfoElements = append(alteredInfoElements, infoElement)
+				elementReplaced = true;
 			} else {
 				fmt.Println("CHAINCODE: Keeping the old element")
 				alteredInfoElements = append(alteredInfoElements, infoElement1)
@@ -139,7 +141,9 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 		}
 		fmt.Println("CHAINCODE: Replacing the infoElementsList with the altered one")
 		person.InfoElements = alteredInfoElements;
-	} else {
+	}
+
+	if elementReplaced == false {
 			fmt.Println("CHAINCODE: Appending info element")
 			person.InfoElements = append(person.InfoElements, infoElement)
 	}

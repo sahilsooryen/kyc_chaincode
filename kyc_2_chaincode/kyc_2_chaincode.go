@@ -29,6 +29,22 @@ import (
 type KYCChaincode struct {
 }
 
+// SubmittedRequest structure
+// type AllRequests struct {
+//     SubmittedRequests []SubmittedRequest `json:"submittedRequests"`;
+// }
+
+var SubmittedRequests []SubmittedRequest
+var submittedRequestsListId string = "SUBMITTED_REQUESTS_ID"
+
+// SubmittedRequest structure
+type SubmittedRequest struct {
+    Id string `json:"id"`;
+		Version string `json:"version"`;
+		SubmittedOn string `json:"submittedOn"`;
+    Person Person `json:"person"`;
+}
+
 // Person structure
 type Person struct {
     Id string `json:"id"`;
@@ -55,6 +71,16 @@ type InfoElement struct {
 
 func (kyc *KYCChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("Init called, initializing chaincode")
+	var err error
+
+	l_submittedRequests := []SubmittedRequest{}
+
+	fmt.Println("CHAINCODE: Writing l_submittedRequests back to ledger")
+	submittedRequestsJSONAsBytes_write, _ := json.Marshal(l_submittedRequests)
+	err = stub.PutState(submittedRequestsListId, submittedRequestsJSONAsBytes_write)
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
 }
@@ -159,6 +185,42 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 	return nil, nil
 
+}
+
+func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+	l_submittedRequests := []SubmittedRequest{}
+	l_submittedRequest := SubmittedRequest{}
+
+	submittedRequestsJSONAsBytes, err := stub.GetState(submittedRequestsListId)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + submittedRequestsListId + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	json.Unmarshal(submittedRequestsJSONAsBytes, &l_submittedRequests)
+	fmt.Println("CHAINCODE: After Unmarshalling submitted requests")
+
+	for _, l_submittedRequest_loop := range l_submittedRequests {
+		if l_submittedRequest_loop.Id != args[0] {
+			return nil, nil
+		}
+	}
+
+	l_submittedRequest.Id = args[0]
+	l_submittedRequest.Version = "v1"
+	l_submittedRequest.SubmittedOn = "Unknown"
+
+	l_submittedRequests = append(l_submittedRequests, l_submittedRequest)
+
+	fmt.Println("CHAINCODE: Writing l_submittedRequests back to ledger")
+	submittedRequestsJSONAsBytes_write, _ := json.Marshal(l_submittedRequests)
+	err = stub.PutState(submittedRequestsListId, submittedRequestsJSONAsBytes_write)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 func (kyc *KYCChaincode) deleteInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {

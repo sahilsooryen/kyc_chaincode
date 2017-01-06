@@ -189,6 +189,10 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+
 	l_submittedRequests := []SubmittedRequest{}
 	l_submittedRequest := SubmittedRequest{}
 
@@ -202,8 +206,8 @@ func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, 
 	fmt.Println("CHAINCODE: After Unmarshalling submitted requests")
 
 	for _, l_submittedRequest_loop := range l_submittedRequests {
-		if l_submittedRequest_loop.Id != args[0] {
-			return nil, nil
+		if l_submittedRequest_loop.Id == args[0] {
+			return nil, errors.New("Request id already submitted")
 		}
 	}
 
@@ -211,6 +215,17 @@ func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, 
 	l_submittedRequest.Version = "v1"
 	l_submittedRequest.SubmittedOn = "Unknown"
 
+	personJSONAsBytes, err := stub.GetState(args[1])
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + args[1] + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	person := Person{}
+	json.Unmarshal(personJSONAsBytes, &person)
+	fmt.Println("CHAINCODE: After Unmarshalling person")
+
+	l_submittedRequest.Person = person
 	l_submittedRequests = append(l_submittedRequests, l_submittedRequest)
 
 	fmt.Println("CHAINCODE: Writing l_submittedRequests back to ledger")
@@ -221,6 +236,37 @@ func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, 
 	}
 
 	return nil, nil
+}
+
+func (kyc *KYCChaincode) querySubmittedRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("CHAINCODE: querySubmittedRequest called")
+
+	var err error
+
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	}
+
+	submittedRequestsJSONAsBytes, err := stub.GetState(submittedRequestsListId)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + submittedRequestsListId + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	l_submittedRequests := []SubmittedRequest{}
+	json.Unmarshal(submittedRequestsJSONAsBytes, &l_submittedRequests)
+	fmt.Println("CHAINCODE: After Unmarshalling l_submittedRequests")
+
+	for _, submittedRequest_loop := range l_submittedRequests {
+		if submittedRequest_loop.Id == args[0] {
+
+			fmt.Println("CHAINCODE: Writing submittedRequest_loop back to ledger")
+			jsonAsBytes, _ := json.Marshal(submittedRequest_loop)
+			return jsonAsBytes, nil
+		}
+	}
+
+	return nil, errors.New("Request not found")
 }
 
 func (kyc *KYCChaincode) deleteInfoElement(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {

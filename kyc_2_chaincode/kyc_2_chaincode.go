@@ -187,7 +187,7 @@ func (kyc *KYCChaincode) updateInfoElement(stub shim.ChaincodeStubInterface, arg
 
 }
 
-func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (kyc *KYCChaincode) saveRequestState(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
 	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -238,8 +238,8 @@ func (kyc *KYCChaincode) saveSubmittedRequest(stub shim.ChaincodeStubInterface, 
 	return nil, nil
 }
 
-func (kyc *KYCChaincode) querySubmittedRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("CHAINCODE: querySubmittedRequest called")
+func (kyc *KYCChaincode) queryRequestState(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("CHAINCODE: queryRequestState called")
 
 	var err error
 
@@ -395,9 +395,9 @@ func (kyc *KYCChaincode) Invoke(stub shim.ChaincodeStubInterface, function strin
 	} else if function == "deleteInfoElement" {
 		fmt.Printf("Function is deleteInfoElement")
 		return kyc.deleteInfoElement(stub, args)
-	} else if function == "saveSubmittedRequest" {
-		fmt.Printf("Function is saveSubmittedRequest")
-		return kyc.saveSubmittedRequest(stub, args)
+	} else if function == "saveRequestState" {
+		fmt.Printf("Function is saveRequestState")
+		return kyc.saveRequestState(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
@@ -415,9 +415,9 @@ func (kyc *KYCChaincode) Query(stub shim.ChaincodeStubInterface, function string
 	} else if function == "queryInfoElement" {
 		fmt.Printf("Function is queryInfoElement")
 		return kyc.queryInfoElement(stub, args)
-	} else if function == "querySubmittedRequest" {
-		fmt.Printf("Function is querySubmittedRequest")
-		return kyc.querySubmittedRequest(stub, args)
+	} else if function == "queryRequestState" {
+		fmt.Printf("Function is queryRequestState")
+		return kyc.queryRequestState(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
